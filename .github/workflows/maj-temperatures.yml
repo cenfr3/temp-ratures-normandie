@@ -1,0 +1,33 @@
+name: maj-temperatures
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'   # toutes les 15 min (heure UTC ; des délais côté GitHub sont possibles)
+  workflow_dispatch:          # ajoute un bouton "Run workflow" pour lancer à la main
+
+permissions:
+  contents: write             # nécessaire pour que le workflow puisse committer le CSV
+
+concurrency:
+  group: maj-temperatures
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Générer temperatures.csv
+        run: python fetch_temperatures.py
+
+      - name: Publier si la donnée a changé
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add temperatures.csv
+          git diff --staged --quiet || (git commit -m "maj températures" && git push)
