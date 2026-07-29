@@ -2,11 +2,11 @@ name: maj-temperatures
 
 on:
   schedule:
-    - cron: '*/15 * * * *'   # toutes les 15 min (heure UTC ; des délais côté GitHub sont possibles)
-  workflow_dispatch:          # ajoute un bouton "Run workflow" pour lancer à la main
+    - cron: '*/15 * * * *'   # secours (GitHub sature souvent cet intervalle) ; le vrai timing vient du déclencheur externe
+  workflow_dispatch:          # déclenché de façon fiable par cron-job.org (et bouton "Run workflow" à la main)
 
 permissions:
-  contents: write             # nécessaire pour que le workflow puisse committer le CSV
+  contents: write             # nécessaire pour committer le CSV
 
 concurrency:
   group: maj-temperatures
@@ -16,9 +16,9 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
 
